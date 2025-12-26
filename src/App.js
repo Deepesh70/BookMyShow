@@ -7,12 +7,13 @@ import MoviePage from './pages/Movie.page';
 import PlayPage from './pages/play.page';
 function App() {
   return (
+    <>
     <Routes>
       <Route path="/" element={<HomePage />}></Route>
       <Route path="/movie/:id" element={<MoviePage/>}></Route>
       <Route path="/plays" element={<PlayPage/>}></Route>
     </Routes>
-  );
+  </>);
 }
 
 export default App;

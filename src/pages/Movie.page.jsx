@@ -3,7 +3,7 @@ import DefaultlayoutHOC from "../layouts/Default.layout";
 
 const MoviePage = () => {
     return (
-        <div>
+        <div className="bg-blue-400">
             Movie Page
         </div>
     )
