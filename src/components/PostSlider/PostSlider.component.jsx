@@ -11,7 +11,7 @@ const PostSlider =(props) => {
         speed: 500,
         slidesToShow: 5,
         slidesToScroll: 4,
-        responsove: [
+        responsive: [
             {
                 breakpoint:1024,
                 settings: {
@@ -48,12 +48,14 @@ const PostSlider =(props) => {
 
         </p>
             </div>  
+            <div className="w-full">
         <Slider {...settings}>
             {posters.map((each, index) => (
                 <Poster{...each} isDark={isDark} key={index}/>
             ))}
 
         </Slider>
+        </div>
         </>
     )
 };
