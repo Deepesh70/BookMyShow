@@ -5,16 +5,17 @@ import Entertainmentcard from "../components/Entertainement/Entertainmentcard.co
 import HeroCarousal from "../components/HeroCarousal/HeroCarousal.component";
 import PosterSlider from "../components/PostSlider/PostSlider.component";
 
-
 const HomePage  =() => {
 
     const [recommendedMovies, setrecommendedMovies] = useState([]);
     const [premierMovies, setpremierMovies] = useState([]);
     const [onlineStreamEvents, setonlineStreamEvents] = useState([]);
 
+    const API_KEY = process.env.REACT_APP_API_KEY;
+
     useEffect(() => {
         const requestTopRatedMovies = async() => {
-            const getTopRatedMovies = await axios.get("https://api.themoviedb.org/3/movie/top_rated?api_key=5cc859c300725e508f298d39ec46cbe1")
+            const getTopRatedMovies = await axios.get(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`)
             setrecommendedMovies(getTopRatedMovies.data.results);
         };
 
