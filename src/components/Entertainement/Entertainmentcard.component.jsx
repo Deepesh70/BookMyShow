@@ -50,8 +50,8 @@ const EntertainmentcardSlider =() => {
     return (
         <>
         <Slider {...settings}>
-            {EntertainmentImage.map((image) => {
-                return <Entertainmentcard src={image} />
+            {EntertainmentImage.map((image, index) => {
+                return <Entertainmentcard src={image} key={index} />
             })}
         </Slider>
         </>
