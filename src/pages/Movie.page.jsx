@@ -5,10 +5,12 @@ import axios from "axios";
 import { MovieContext } from "../components/context/Movies.context";
 import { FaCcVisa , FaCcApplePay} from "react-icons/fa";
 import PostSlider from "../components/PostSlider/PostSlider.component";
+
+
 const MoviePage = () => {
 
     const { id } = useParams();
-    const { movie } = useContext(MovieContext);
+    const { movie, setMovie } = useContext(MovieContext);
     const [cast, setCast ] = useState([]);
     const [ SimilarMovies, setSimilarMovies]= useState([]);
     const [ recommendedmovies, setrecommendedMovies] = useState([]);
@@ -38,6 +40,13 @@ const MoviePage = () => {
         requestrecommendedMovies();
     }, [id]);
 
+    useEffect(() => {
+        const requestMovie = async () => {
+            const getMovieData = await axios.get(`/${id}`);
+            setMovie(getMovieData.data);
+        }
+        requestMovie();
+    })
 
     const settingCast = {
 

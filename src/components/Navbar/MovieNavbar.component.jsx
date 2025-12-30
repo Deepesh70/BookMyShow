@@ -1,4 +1,59 @@
-import React from "react";
+import React, { useContext } from "react";
+import { BiChevronDown, BiMenu, BiSearch, BiShareAlt } from "react-icons/bi";
+import { MovieContext } from "../context/Movies.context";
+
+
+const Navsm = () => {
+
+    const movie = useContext(MovieContext);
+
+    return (
+        <>
+            <div className="text-gray-700 flex items-center justify-between">
+                <div>
+                    <h3 className="text-xl font-bold">{movie.original_title}
+                    </h3>
+                </div>
+
+            </div>
+            <div className="w-8 h-8">
+                <BiShareAlt className="w-full h-full" />
+            </div>
+        </>
+    )
+};
+
+
+const Navlg=() => {
+    
+    const movie = useContext(MovieContext);
+
+    return (
+        <>
+        <div className="container flex mx-auto px-4 items-center justify-between">
+            <div className="flex items-center w-1/2 gap-3">
+                <div className="w-10 h-10">
+                    <img 
+                        src=""
+                        alt="logo"
+                        className="w-full h-full"
+                    />
+                </div>
+                <div className="w-full flex items-center gap-3 bg-white px-3 py-1 rounded-md">
+                                        <BiSearch />
+                                        <input
+                                            type="search"
+                                            className="w-full bg-transparent border-none focus:outline-none"
+                                            placeholder="Search for movies, events, plays, sports and activities"
+                                        />
+                
+                                    </div>
+            </div>
+        </div>
+
+        </>
+    )
+}
 
 const MovieNavbar =() => {
     return(
