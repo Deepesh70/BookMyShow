@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
-import DefaultlayoutHOC from "../layouts/Default.layout";
+import MovielayoutHOC from "../layouts/Movie.layout";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { MovieContext } from "../components/context/Movies.context";
 import { FaCcVisa , FaCcApplePay} from "react-icons/fa";
 import PostSlider from "../components/PostSlider/PostSlider.component";
+import MovieHero from "../components/MovieHero/MovieHero";
 
 
 const MoviePage = () => {
@@ -46,7 +47,7 @@ const MoviePage = () => {
             setMovie(getMovieData.data);
         }
         requestMovie();
-    })
+    }, [id]);
 
     const settingCast = {
 
@@ -59,6 +60,7 @@ const MoviePage = () => {
 
     return (
         <>
+        <MovieHero />
         <div className="my-12 container px-4 lg-ml-20 lg:w-2/1">
         <div className="flex flex-col items-start gap-3">
             <h1 className="text-gray-800 font-bold text-2xl"> 
@@ -131,4 +133,4 @@ const MoviePage = () => {
     )
 };
 
-export default DefaultlayoutHOC(MoviePage);
+export default MovielayoutHOC(MoviePage);

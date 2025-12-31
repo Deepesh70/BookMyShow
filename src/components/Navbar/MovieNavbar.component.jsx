@@ -5,19 +5,17 @@ import { MovieContext } from "../context/Movies.context";
 
 const Navsm = () => {
 
-    const movie = useContext(MovieContext);
+    const { movie } = useContext(MovieContext);
 
     return (
         <>
             <div className="text-gray-700 flex items-center justify-between">
                 <div>
-                    <h3 className="text-xl font-bold">{movie.original_title}
-                    </h3>
+                    <h3 className="text-xl font-bold">{movie.original_title}</h3>
                 </div>
-
-            </div>
-            <div className="w-8 h-8">
-                <BiShareAlt className="w-full h-full" />
+                <div className="w-8 h-8">
+                    <BiShareAlt className="w-full h-full" />
+                </div>
             </div>
         </>
     )
@@ -26,7 +24,7 @@ const Navsm = () => {
 
 const Navlg=() => {
     
-    const movie = useContext(MovieContext);
+    const { movie } = useContext(MovieContext);
 
     return (
         <>
@@ -34,7 +32,7 @@ const Navlg=() => {
             <div className="flex items-center w-1/2 gap-3">
                 <div className="w-10 h-10">
                     <img 
-                        src=""
+                        src="https://i.ibb.co/zPBYW3H/imgbin-bookmyshow-office-android-ticket-png.png"
                         alt="logo"
                         className="w-full h-full"
                     />
@@ -57,9 +55,18 @@ const Navlg=() => {
 
 const MovieNavbar =() => {
     return(
-        <div>
-            movie navbar
-        </div>
+       <>
+        <nav className="bg-white border-b-2 lg:border-b-0 lg:bg-darkBackground-700 p-4">
+            <div className="lg:hidden">
+                <Navsm/>
+            </div>
+            <div className="hidden w-full lg:flex">
+                <Navlg/>
+            </div>
+
+        </nav>
+       
+       </>
     )
 };
 
