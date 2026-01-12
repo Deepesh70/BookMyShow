@@ -11,7 +11,7 @@ const HomePage  =() => {
     const [premierMovies, setpremierMovies] = useState([]);
     const [onlineStreamEvents, setonlineStreamEvents] = useState([]);
 
-    // const API_KEY = process.env.REACT_APP_API_KEY;
+
 
     useEffect(() => {
         const requestPopularMovies = async() => {
