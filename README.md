@@ -7,6 +7,7 @@ A responsive movie booking application interface built with React, designed to r
 - **Home Page**:Browse a carousel of latest movies and entertainment events.
 - **Movie Details**: View detailed information about movies, including cast, crew, and synopsis.
 - **Plays**: A dedicated section for browsing plays and live events.
+- **ML Recommendations**: Personalized movie recommendations powered by a Python-based Machine Learning model.
 - **Responsive Design**: Optimized for various screen sizes using Tailwind CSS.
 
 ## Tech Stack
@@ -17,6 +18,17 @@ A responsive movie booking application interface built with React, designed to r
 - **HTTP Client**: Axios
 - **Icons**: React Icons
 - **Carousels**: React Slick
+- **ML Model**: Python (pandas, scikit-learn)
+
+## Machine Learning Integration
+
+The project includes a Python-based Content-Based Recommendation System.
+
+- **How it works**: A Python script processes `movies_dict.pkl` and `similarity.pkl` files to generate a static JSON file (`recommendations.json`). The React frontend uses this JSON to display recommendations when a user searches for or views a specific movie.
+- **Limitations**:
+  - The ML recommendations **only work for specific movies** that exist in the provided dataset.
+  - The matching is **sensitive to exact names** (case-sensitive and exact string match) as defined in the dataset.
+
 
 ## Prerequisites
 
