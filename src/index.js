@@ -9,7 +9,7 @@ import MovieProvider from './components/context/Movies.context';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter>     { /* wrap your application with BrowserRouter to enables client-side routing for Single Page Applications */ }
     <MovieProvider>
     <App />
     </MovieProvider>
