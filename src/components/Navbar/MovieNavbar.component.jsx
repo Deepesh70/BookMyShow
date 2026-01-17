@@ -60,7 +60,7 @@ const Navlg=() => {
 const MovieNavbar =() => {
     return(
        <>
-        <nav className="bg-white border-b-2 lg:border-b-0 lg:bg-darkBackground-700 p-4">
+        <nav className="bg-white border-b-2 lg:border-b-0 lg:bg-darkBackground-700 p-4 sticky top-0 z-50 ">
             <div className="lg:hidden">
                 <Navsm/>
             </div>
