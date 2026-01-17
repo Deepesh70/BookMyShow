@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import HeroSlider from "react-slick";
 import axios from "axios";
 import { NextArrow, PrevArrow } from "./Arrows.component";
+import { Link } from "react-router-dom";
+
 
 const HeroCarousal = () => {
     const [images, setImages] = useState([]);
@@ -39,31 +41,35 @@ const HeroCarousal = () => {
 
     return (
         <>
+       
             <div className="lg:hidden">
                 <HeroSlider {...settings}>
                     {images.map((image, index) => (
+                        <Link to={`/movie/${image.id}`}>
                         <div className="w-full h-56 md:h-80 py-3 relative" key={index}>
                             <img
                                 src={`https://image.tmdb.org/t/p/original${image.backdrop_path}`}
                                 alt="Hero Banner"
-                                className="w-full h-full rounded-md object-cover"
+                                className="w-full h-auto rounded-md object-cover object-top"
                             />
                             <div className="absolute bottom-0 w-full h-2/3 bg-gradient-to-t from-black to-transparent rounded-md flex flex-col justify-end p-4">
                                 <h3 className="text-white text-xl font-bold truncate">{image.original_title}</h3>
                                 <p className="text-white text-xs line-clamp-2">{image.overview}</p>
                             </div>
-                        </div>
+                        </div></Link>
                     ))}
                 </HeroSlider>
             </div>
-            <div className="hidden lg:block">
+            <div className="hidden lg:block py-5">
                 <HeroSlider {...settingsLG}>
                     {images.map((image, index) => (
-                        <div className="w-full h-96 px-2 py-3 relative focus:outline-none" key={index}>
+                         <Link to={`/movie/${image.id}`}>
+                        <div className="w-full h-fit px-2 py-3 relative focus:outline-none cursor-pointer" key={index}>
+                           
                             <img
                                 src={`https://image.tmdb.org/t/p/original${image.backdrop_path}`}
                                 alt="Hero Banner"
-                                className="w-full h-full rounded-md object-cover"
+                                className="w-full h-full rounded-md object-cover object-top"
                             />
                             <div className="absolute bottom-0 left-2 right-2 top-0 bg-gradient-to-r from-black/80 via-transparent to-transparent rounded-md z-10" />
 
@@ -76,7 +82,7 @@ const HeroCarousal = () => {
                                 </div>
                             </div>
 
-                        </div>
+                        </div></Link>
                     ))}
                 </HeroSlider>
 
