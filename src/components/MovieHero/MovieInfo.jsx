@@ -40,26 +40,6 @@ const MovieInfo = () => {
     )
 }
 
-//     const rentMovie = () =>{
-//         setisOpen(true);
-//         setPrice(549);
-//         return (
-//             <>
-//          {/* <PaymentModel setisOpen={setisOpen} isOpen={isOpen}.price /> */}
-
-            
-//             </>
-//         )
-//     };
-
-//     const buyMovie = () => {
-    
-//   return (
-//     <>
-    
-//     </>
-//   )
-// }
 
 
 export default MovieInfo
