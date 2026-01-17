@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import { BiChevronDown, BiMenu, BiSearch } from "react-icons/bi";
+import { MovieContext } from "../context/Movies.context";
 
 
 function Navsm() {
@@ -21,11 +22,17 @@ function Navsm() {
 }
 
 function NavMd() {
+    const { search, setSearch } = useContext(MovieContext);
     return (
         <>
             <div className="w-full flex items-center gap-3 bg-white px-3 py-1 rounded-md">
                 <BiSearch />
-                <input type="search" className="w-full bg-transparent border-none focus:outline-none" />
+                <input 
+                    type="search" 
+                    className="w-full bg-transparent border-none focus:outline-none" 
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
             </div>
 
 
@@ -34,6 +41,7 @@ function NavMd() {
 }
 
 function NavLg() {
+    const { search, setSearch } = useContext(MovieContext);
     return (
         <>
             <div className="container flex mx-auto px-4 items-center justify-between">
@@ -52,7 +60,9 @@ function NavLg() {
                         <input
                             type="search"
                             className="w-full bg-transparent border-none focus:outline-none"
+                            value={search}
                             placeholder="Search for movies, events, plays, sports and activities"
+                            onChange={(e) => setSearch(e.target.value)}
                         />
 
                     </div>

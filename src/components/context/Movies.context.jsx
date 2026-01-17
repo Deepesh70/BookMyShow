@@ -10,8 +10,10 @@ const MovieProvider = ({ children }) => {
         backdrop_path:"",
         poster_path: "",
     });
+    const [search, setSearch] = useState("");
+
     return (
-       <MovieContext.Provider value={{ movie, setMovie }}>
+       <MovieContext.Provider value={{ movie, setMovie, search, setSearch }}>
         {children}
        </MovieContext.Provider> 
     )

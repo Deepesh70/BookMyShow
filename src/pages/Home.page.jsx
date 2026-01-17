@@ -1,12 +1,14 @@
-import {React, useEffect, useState} from "react";
+import {React, useEffect, useState, useContext} from "react";
 import axios from "axios";
 import DefaultlayoutHOC from "../layouts/Default.layout";
 import Entertainmentcard from "../components/Entertainement/Entertainmentcard.component";
 import HeroCarousal from "../components/HeroCarousal/HeroCarousal.component";
 import PosterSlider from "../components/PostSlider/PostSlider.component";
+import { MovieContext } from "../components/context/Movies.context";
 
 const HomePage  =() => {
-
+    const { search } = useContext(MovieContext);
+    const [searchResults, setSearchResults] = useState([]);
     const [recommendedMovies, setrecommendedMovies] = useState([]);
     const [premierMovies, setpremierMovies] = useState([]);
     const [onlineStreamEvents, setonlineStreamEvents] = useState([]);
@@ -39,6 +41,38 @@ const HomePage  =() => {
 
         requestTopRatedMovies();
     },[])
+
+    useEffect(() => {
+    if (search) {
+      const requestSearchMovies = async () => {
+        try {
+          const getSearchMovies = await axios.get(`https://api.themoviedb.org/3/search/movie`, {
+            params: { query: search },
+          });
+          setSearchResults(getSearchMovies.data.results);
+        } catch (error) {
+          console.error("Search API failed", error);
+        }
+      };
+      requestSearchMovies();
+    }
+  }, [search]);
+
+  if (search) {
+    return (
+      <>
+     
+        <div className="container mx-auto px-4 md:px-12 my-8">
+          <PosterSlider
+            title={`Search Results for "${search}"`}
+            subtitle=""
+            posters={searchResults}
+            isDark={false}
+          />
+        </div>
+      </>
+    );
+  }
 
     return(
        <>

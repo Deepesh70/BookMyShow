@@ -44,7 +44,7 @@ const Navlg=() => {
                                             className="w-full bg-transparent border-none focus:outline-none"
                                             placeholder="Search for movies, events, plays, sports and activities"
                                         />
-                
+        
                                     </div>
             </div>
         </div>
