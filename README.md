@@ -196,6 +196,12 @@ This project is for educational and personal use.
 
 ---
 
+## 📚 Additional Documentation
+
+Detailed project documentation is available in [`/docs`](./docs/README.md), including setup, architecture, and feature walkthrough guides.
+
+---
+
 <p align="center">
   Made with ❤️ using React & Tailwind CSS
 </p>
