@@ -9,7 +9,7 @@ const Footer = () => {
   const movieGenres = ['Action', 'Sci-Fi', 'Drama', 'Adventure', 'Comedy', 'Horror', 'Animation', 'Thriller'];
   const quickLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Movies', path: '/' },
+    { name: 'Movies', path: '/movies' },
     { name: 'Plays & Events', path: '/plays' },
   ];
   const legalLinks = ['Privacy Policy', 'Terms of Service', 'Cookie Preferences', 'Help Center'];
