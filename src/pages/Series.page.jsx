@@ -5,7 +5,6 @@ import tmdbService from '../services/tmdb';
 import { MovieContext } from '../components/context/Movies.context';
 import { PosterSliderSkeleton } from '../components/common/LoadingSkeleton';
 import {
-  FaFilter,
   FaSortAmountDown,
   FaStar,
   FaTh,
@@ -16,7 +15,6 @@ import {
   FaUndo,
   FaTv,
 } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
 
 const TV_GENRES = [
   { id: 'all', name: 'All Genres' },
