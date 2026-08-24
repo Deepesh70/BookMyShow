@@ -1,206 +1,225 @@
-import { React, useEffect, useState, useContext } from "react";
-import axios from "axios";
-import DefaultlayoutHOC from "../layouts/Default.layout";
-import HeroCarousal from "../components/HeroCarousal/HeroCarousal.component";
-import PosterSlider from "../components/PostSlider/PostSlider.component";
-import CategoryFilter from "../components/CategoryFilter/CategoryFilter.component";
-import FeaturedMovie from "../components/FeaturedMovie/FeaturedMovie.component";
-import { MovieContext } from "../components/context/Movies.context";
+import React, { useEffect, useState, useContext } from 'react';
+import DefaultlayoutHOC from '../layouts/Default.layout';
+import HeroCarousal from '../components/HeroCarousal/HeroCarousal.component';
+import PosterSlider from '../components/PostSlider/PostSlider.component';
+import CategoryFilter from '../components/CategoryFilter/CategoryFilter.component';
+import FeaturedMovie from '../components/FeaturedMovie/FeaturedMovie.component';
+import Poster from '../components/poster/Poster.component';
+import { MovieContext } from '../components/context/Movies.context';
+import tmdbService from '../services/tmdb';
+import { PosterSliderSkeleton } from '../components/common/LoadingSkeleton';
 
 const HomePage = () => {
-  const { search } = useContext(MovieContext);
+  const { search, myList } = useContext(MovieContext);
   const [searchResults, setSearchResults] = useState([]);
   const [popularMovies, setPopularMovies] = useState([]);
   const [topRatedMovies, setTopRatedMovies] = useState([]);
   const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
-  const [activeCategory, setActiveCategory] = useState("popular");
+  const [activeCategory, setActiveCategory] = useState('popular');
   const [filteredMovies, setFilteredMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch Popular Movies
+  // Load all movie categories using tmdbService
   useEffect(() => {
-    const requestPopularMovies = async () => {
-      const res = await axios.get(`/popular`);
-      setPopularMovies(res.data.results);
-    };
-    requestPopularMovies();
-  }, []);
-
-  // Fetch Top Rated Movies
-  useEffect(() => {
-    const requestTopRatedMovies = async () => {
-      const res = await axios.get(`/top_rated`);
-      setTopRatedMovies(res.data.results);
-    };
-    requestTopRatedMovies();
-  }, []);
-
-  // Fetch Upcoming Movies
-  useEffect(() => {
-    const requestUpcomingMovies = async () => {
-      const res = await axios.get(`/upcoming`);
-      setUpcomingMovies(res.data.results);
-    };
-    requestUpcomingMovies();
-  }, []);
-
-  // Fetch Trending Movies (weekly)
-  useEffect(() => {
-    const requestTrendingMovies = async () => {
+    let isMounted = true;
+    const loadAllMovies = async () => {
+      setLoading(true);
       try {
-        const res = await axios.get(
-          `https://api.themoviedb.org/3/trending/movie/week`,
-          { params: { api_key: process.env.REACT_APP_API_KEY } }
-        );
-        setTrendingMovies(res.data.results);
+        const [popular, topRated, upcoming, trending, nowPlaying] = await Promise.all([
+          tmdbService.getPopular(),
+          tmdbService.getTopRated(),
+          tmdbService.getUpcoming(),
+          tmdbService.getTrending(),
+          tmdbService.getNowPlaying(),
+        ]);
+
+        if (isMounted) {
+          setPopularMovies(popular || []);
+          setTopRatedMovies(topRated || []);
+          setUpcomingMovies(upcoming || []);
+          setTrendingMovies(trending || []);
+          setNowPlayingMovies(nowPlaying || []);
+          setFilteredMovies(popular || []);
+          setLoading(false);
+        }
       } catch (err) {
-        console.error("Trending API failed", err);
+        console.error('Error fetching home page movie sections:', err);
+        if (isMounted) setLoading(false);
       }
     };
-    requestTrendingMovies();
-  }, []);
 
-  // Fetch Now Playing
-  useEffect(() => {
-    const requestNowPlaying = async () => {
-      const res = await axios.get(`/now_playing`);
-      setNowPlayingMovies(res.data.results);
+    loadAllMovies();
+    return () => {
+      isMounted = false;
     };
-    requestNowPlaying();
   }, []);
 
   // Category Filter Logic
   useEffect(() => {
-    if (activeCategory === "popular") {
+    if (activeCategory === 'popular') {
       setFilteredMovies(popularMovies);
     } else {
-      const genreFiltered = [...popularMovies, ...topRatedMovies, ...nowPlayingMovies]
-        .filter(m => m.genre_ids?.includes(activeCategory))
-        .filter((movie, index, self) =>
-          index === self.findIndex(m => m.id === movie.id)
-        );
-      setFilteredMovies(genreFiltered);
+      const allMovies = [...popularMovies, ...topRatedMovies, ...nowPlayingMovies, ...trendingMovies];
+      const genreFiltered = allMovies
+        .filter((m) => m.genre_ids?.includes(Number(activeCategory)))
+        .filter((movie, index, self) => index === self.findIndex((m) => m.id === movie.id));
+      setFilteredMovies(genreFiltered.length > 0 ? genreFiltered : popularMovies);
     }
-  }, [activeCategory, popularMovies, topRatedMovies, nowPlayingMovies]);
+  }, [activeCategory, popularMovies, topRatedMovies, nowPlayingMovies, trendingMovies]);
 
-  // Search
+  // Search execution
   useEffect(() => {
-    if (search) {
-      const requestSearchMovies = async () => {
-        try {
-          const res = await axios.get(
-            `https://api.themoviedb.org/3/search/movie`,
-            { params: { query: search } }
-          );
-          setSearchResults(res.data.results);
-        } catch (error) {
-          console.error("Search API failed", error);
-        }
+    let isMounted = true;
+    if (search && search.trim()) {
+      const execSearch = async () => {
+        const results = await tmdbService.searchMovies(search);
+        if (isMounted) setSearchResults(results);
       };
-      requestSearchMovies();
+      execSearch();
+    } else {
+      setSearchResults([]);
     }
+    return () => {
+      isMounted = false;
+    };
   }, [search]);
 
   // Search Results View
-  if (search) {
+  if (search && search.trim()) {
     return (
-      <div className="min-h-screen pt-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <PosterSlider
-            title={`Search Results for "${search}"`}
-            subtitle={`${searchResults.length} results found`}
-            posters={searchResults}
-            isDark={true}
-          />
+      <div className="min-h-screen pt-24 pb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-6">
+            <h1 className="text-2xl sm:text-3xl font-black text-white">
+              Search Results for <span className="text-accent-gold">"{search}"</span>
+            </h1>
+            <p className="text-gray-400 text-sm mt-1">
+              Found {searchResults.length} matching titles
+            </p>
+          </div>
+
+          {searchResults.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {searchResults.map((movie) => (
+                <Poster {...movie} key={movie.id} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20 bg-dark-800/50 rounded-2xl border border-white/5 p-8">
+              <p className="text-gray-400 text-base mb-2">No movies found matching "{search}"</p>
+              <p className="text-gray-600 text-sm">Try searching for popular titles like "Dune", "Batman", or "Avatar"</p>
+            </div>
+          )}
         </div>
       </div>
     );
   }
 
-  // Featured movie — pick the first popular movie with a good backdrop
-  const featuredMovie1 = popularMovies.find(m => m.backdrop_path && m.vote_average > 6) || popularMovies[0];
-  const featuredMovie2 = trendingMovies.find(m => m.backdrop_path && m.id !== featuredMovie1?.id) || trendingMovies[1];
+  // Spotlights
+  const featuredMovie1 =
+    popularMovies.find((m) => m.backdrop_path && m.vote_average >= 7) || popularMovies[0];
+  const featuredMovie2 =
+    topRatedMovies.find((m) => m.backdrop_path && m.id !== featuredMovie1?.id) || topRatedMovies[0];
 
   return (
     <div className="min-h-screen">
       {/* Hero Carousel */}
       <HeroCarousal />
 
-      {/* Category Filters */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 relative z-40 mb-10">
-        <CategoryFilter
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-        />
+      {/* Main Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        {/* Category Pills Filter */}
+        <div className="mb-8">
+          <CategoryFilter
+            activeCategory={activeCategory}
+            onCategoryChange={setActiveCategory}
+          />
+        </div>
+
+        {/* My List Section (if user has saved movies) */}
+        {myList && myList.length > 0 && (
+          <section className="mb-12">
+            <PosterSlider
+              title="My Watchlist"
+              subtitle={`${myList.length} saved for later`}
+              posters={myList}
+              isDark={true}
+            />
+          </section>
+        )}
+
+        {/* Filtered / Trending Section */}
+        {loading ? (
+          <PosterSliderSkeleton count={6} />
+        ) : (
+          <section className="mb-12">
+            <PosterSlider
+              title={activeCategory === 'popular' ? 'Trending Hits' : 'Genre Selection'}
+              subtitle="Curated picks tailored for high resolution streaming"
+              posters={filteredMovies}
+              isDark={true}
+            />
+          </section>
+        )}
+
+        {/* Spotlight Featured 1 */}
+        {featuredMovie1 && !loading && (
+          <section className="mb-14">
+            <FeaturedMovie movie={featuredMovie1} />
+          </section>
+        )}
+
+        {/* Top Rated Masterpieces */}
+        {loading ? (
+          <PosterSliderSkeleton count={6} />
+        ) : (
+          <section className="mb-12">
+            <PosterSlider
+              title="Top Rated Masterpieces"
+              subtitle="Critically acclaimed movies of all time"
+              posters={topRatedMovies}
+              isDark={true}
+            />
+          </section>
+        )}
+
+        {/* Upcoming Movies */}
+        {loading ? (
+          <PosterSliderSkeleton count={6} />
+        ) : (
+          <section className="mb-12">
+            <PosterSlider
+              title="Coming Soon to Theaters"
+              subtitle="Get ready for next big blockbusters"
+              posters={upcomingMovies}
+              isDark={true}
+            />
+          </section>
+        )}
+
+        {/* Spotlight Featured 2 */}
+        {featuredMovie2 && !loading && (
+          <section className="mb-14">
+            <FeaturedMovie movie={featuredMovie2} />
+          </section>
+        )}
+
+        {/* Now Playing in Theaters */}
+        {loading ? (
+          <PosterSliderSkeleton count={6} />
+        ) : (
+          <section className="mb-12">
+            <PosterSlider
+              title="Now Playing in Theaters"
+              subtitle="Currently showing in theaters and IMAX"
+              posters={nowPlayingMovies}
+              isDark={true}
+            />
+          </section>
+        )}
       </div>
-
-      {/* Most Viewed / Filtered Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        <PosterSlider
-          title={activeCategory === "popular" ? "Most Viewed" : "Filtered Results"}
-          subtitle="Top picks for you"
-          posters={filteredMovies}
-          isDark={true}
-        />
-      </section>
-
-      {/* Featured Movie Spotlight 1 */}
-      {featuredMovie1 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-          <FeaturedMovie movie={featuredMovie1} />
-        </section>
-      )}
-
-      {/* Most Popular */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        <PosterSlider
-          title="Most Popular"
-          subtitle="Trending this week"
-          posters={trendingMovies}
-          isDark={true}
-        />
-      </section>
-
-      {/* Top Rated */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        <PosterSlider
-          title="Top Rated"
-          subtitle="Highest rated movies of all time"
-          posters={topRatedMovies}
-          isDark={true}
-        />
-      </section>
-
-      {/* Featured Movie Spotlight 2 */}
-      {featuredMovie2 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-8 text-center">
-            Popular TV Series
-          </h2>
-          <FeaturedMovie movie={featuredMovie2} />
-        </section>
-      )}
-
-      {/* Upcoming Movies */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        <PosterSlider
-          title="Coming Soon"
-          subtitle="Don't miss these upcoming releases"
-          posters={upcomingMovies}
-          isDark={true}
-        />
-      </section>
-
-      {/* Now Playing */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-        <PosterSlider
-          title="Now Playing"
-          subtitle="Currently in theaters"
-          posters={nowPlayingMovies}
-          isDark={true}
-        />
-      </section>
     </div>
   );
 };

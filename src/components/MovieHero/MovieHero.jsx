@@ -1,89 +1,73 @@
-import React, { useContext } from "react";
-import { MovieContext } from "../context/Movies.context";
-import MovieInfo from "./MovieInfo";
+import React, { useContext } from 'react';
+import { MovieContext } from '../context/Movies.context';
+import MovieInfo from './MovieInfo';
 
+const MovieHero = () => {
+  const { movie } = useContext(MovieContext);
 
-const MovieHero = () =>{
-    const { movie } = useContext(MovieContext);
+  if (!movie || !movie.id) return null;
 
-    const genres = movie.genres?.map(({name}) => name).join(", ");
-    return (
-        <>
-        <div>
-        <div className="lg:hidden w-full">
-            <img
-                src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
-                alt="cover-poster"
-                className="m-4 rounded"
-                style={{width: "calc(100% - 2rem)"}} 
+  const backdrop = movie.backdrop_path
+    ? (movie.backdrop_path.startsWith('http')
+      ? movie.backdrop_path
+      : `https://image.tmdb.org/t/p/original${movie.backdrop_path}`)
+    : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1920&q=80';
 
-            />
-            
-            <div className="flex flex-col gap-3 lg:hidden">
-                <div className="flex flex-col-reverse gap-3 px-4 my-3">
-                    <div className="text-black flex flex-col gap-2 md:px-4">
-                        <h4>
-                            4K rating
-                        </h4>
-                        <h4>English, Hindi, Kannada, Tamil , Telgu</h4>
-                        <h4>
-                            {movie.runtime} min | {genres}
-                        </h4>
-                    </div>
+  const poster = movie.poster_path
+    ? (movie.poster_path.startsWith('http')
+      ? movie.poster_path
+      : `https://image.tmdb.org/t/p/w500${movie.poster_path}`)
+    : backdrop;
 
-                </div>
-                <div className="flex items-center gap-3 md:px-4 md:w-screen text-xl px-4">
-                    <button  className="bg-red-500 w-full py-3 text-white font-semibold rounded-lg">
-                        Rent $149
-                    </button>
-                    <button  className="bg-red-500 w-full py-3 text-white font-semibold rounded-lg">
-                        Buy $559
-                    </button>
-
-                </div>
-
-            </div>
+  return (
+    <div className="relative w-full overflow-hidden bg-dark-900">
+      {/* Mobile Layout */}
+      <div className="lg:hidden w-full">
+        <div className="relative w-full aspect-video">
+          <img
+            src={backdrop}
+            alt={movie.title || movie.original_title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent" />
         </div>
-       
-
-       <div className="relative hidden w-full lg:block" style={{height: "30rem"}}>
-        <div className="absolute z-10 w-full h-full"
-             style={{backgroundImage: "linear-gradient(90deg, rgb(34, 34, 34) 24.97%, rgb(34, 34, 34) 38.3%, rgba(34, 34, 34, 0.04) 97.47%, rgb(34, 34, 34) 100%)"}}
-        />
-        <div className="absolute z-0 w-full h-full">
-             <img
-                src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
-                alt="backdrop"
-                className="w-full h-full object-cover object-center"
-             />
+        <div className="px-4 py-4 -mt-16 relative z-10">
+          <MovieInfo movie={movie} />
         </div>
-        <div className="absolute z-30 left-24 top-10 flex items-center gap-10">
-            <div className="w-64 h-64">
-                <img
-                    src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
-                    alt="Movie-Poster"
-                    className="w-full h-full rounded-lg"
-                />
+      </div>
 
-            </div>
-            <div>
-                <MovieInfo movie={movie} />
-
-            </div>
-
-        </div>
+      {/* Desktop Layout */}
+      <div className="relative hidden w-full lg:block" style={{ height: '520px' }}>
+        {/* Background Backdrop Image */}
         <img
-            src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
-        alt="backdrop"
-        className="w-full h-full object-cover object-center"
+          src={backdrop}
+          alt={movie.title || movie.original_title}
+          className="absolute inset-0 w-full h-full object-cover object-top"
         />
 
-            
-       </div>
+        {/* Sophisticated Gradients */}
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-900 via-dark-900/85 to-dark-900/40 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-black/50 z-10" />
+
+        {/* Content Container */}
+        <div className="relative z-20 max-w-7xl mx-auto h-full px-8 flex items-center gap-10">
+          {/* Poster Card */}
+          <div className="w-64 h-96 flex-shrink-0 rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-dark-800">
+            <img
+              src={poster}
+              alt={movie.title || movie.original_title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* Movie Details Info */}
+          <div className="flex-1">
+            <MovieInfo movie={movie} />
+          </div>
         </div>
-        
-        </>
-    )
+      </div>
+    </div>
+  );
 };
 
 export default MovieHero;

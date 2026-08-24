@@ -1,28 +1,28 @@
+import React from 'react';
 import './App.css';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { Routes, Route } from 'react-router-dom';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/Home.page';
 import MoviePage from './pages/Movie.page';
 import PlayPage from './pages/play.page';
-import axios from 'axios';
-
-
-const API_KEY = process.env.REACT_APP_API_KEY;
-
-axios.defaults.baseURL = "https://api.themoviedb.org/3/movie";
-axios.defaults.params = {};
-axios.defaults.params["api_key"] = `${API_KEY}`
+import MovieProvider from './components/context/Movies.context';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 function App() {
   return (
-    <>
-    <Routes>
-      <Route path="/" element={<HomePage />}></Route>
-      <Route path="/movie/:id" element={<MoviePage/>}></Route>
-      <Route path="/plays" element={<PlayPage/>}></Route>
-    </Routes>
-  </>);
+    <ErrorBoundary>
+      <MovieProvider>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/movie/:id" element={<MoviePage />} />
+          <Route path="/plays" element={<PlayPage />} />
+          {/* Catch-all redirect to Home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </MovieProvider>
+    </ErrorBoundary>
+  );
 }
 
 export default App;
