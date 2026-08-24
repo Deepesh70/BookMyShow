@@ -37,9 +37,9 @@ const PostSlider = (props) => {
   }
 
   const settings = {
-    infinite: posters.length > 5,
+    infinite: posters.length > 6,
     speed: 500,
-    slidesToShow: Math.min(6, posters.length),
+    slidesToShow: 6,
     slidesToScroll: 2,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
@@ -47,28 +47,28 @@ const PostSlider = (props) => {
       {
         breakpoint: 1280,
         settings: {
-          slidesToShow: Math.min(5, posters.length),
+          slidesToShow: 5,
           slidesToScroll: 2,
         },
       },
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: Math.min(4, posters.length),
+          slidesToShow: 4,
           slidesToScroll: 2,
         },
       },
       {
         breakpoint: 768,
         settings: {
-          slidesToShow: Math.min(3, posters.length),
+          slidesToShow: 3,
           slidesToScroll: 1,
         },
       },
       {
         breakpoint: 480,
         settings: {
-          slidesToShow: Math.min(2, posters.length),
+          slidesToShow: 2,
           slidesToScroll: 1,
         },
       },
@@ -97,14 +97,34 @@ const PostSlider = (props) => {
         )}
       </div>
 
-      {/* Slider Container */}
-      <div className="w-full relative px-1">
-        <Slider {...settings}>
+      {/* When few items (<= 5), render in standard small-card CSS grid rather than stretching full screen */}
+      {posters.length <= 5 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 px-1">
           {posters.map((movie, index) => (
-            <Poster {...movie} isDark={isDark} key={movie.id || index} />
+            <Poster
+              {...movie}
+              isDark={isDark}
+              key={movie.id ? `movie-${movie.id}` : `idx-${index}`}
+            />
           ))}
-        </Slider>
-      </div>
+        </div>
+      ) : (
+        /* Slider Container for > 5 items */
+        <div className="w-full relative px-1">
+          <Slider
+            key={`${title}-${posters.length}-${posters.map((p) => p.id).slice(0, 4).join('-')}`}
+            {...settings}
+          >
+            {posters.map((movie, index) => (
+              <Poster
+                {...movie}
+                isDark={isDark}
+                key={movie.id ? `movie-${movie.id}` : `idx-${index}`}
+              />
+            ))}
+          </Slider>
+        </div>
+      )}
     </div>
   );
 };

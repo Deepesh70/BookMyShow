@@ -10,7 +10,7 @@ const Footer = () => {
   const quickLinks = [
     { name: 'Home', path: '/' },
     { name: 'Movies', path: '/movies' },
-    { name: 'Plays & Events', path: '/plays' },
+    { name: 'TV Series', path: '/series' },
   ];
   const legalLinks = ['Privacy Policy', 'Terms of Service', 'Cookie Preferences', 'Help Center'];
 

@@ -1,11 +1,4 @@
 import axios from 'axios';
-import {
-  MOCK_NOW_PLAYING,
-  MOCK_POPULAR,
-  MOCK_TOP_RATED,
-  MOCK_UPCOMING,
-  MOCK_CAST
-} from '../data/mockMovies';
 
 const API_KEY = process.env.REACT_APP_API_KEY || '';
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -27,132 +20,218 @@ apiClient.interceptors.request.use((config) => {
 });
 
 export const tmdbService = {
+  // --- Movies Endpoints ---
   getNowPlaying: async () => {
+    if (!API_KEY) return [];
     try {
-      if (!API_KEY) return MOCK_NOW_PLAYING;
       const res = await apiClient.get('/movie/now_playing');
-      return res.data?.results?.length ? res.data.results : MOCK_NOW_PLAYING;
+      return res?.data?.results || [];
     } catch (err) {
-      console.warn('TMDB Now Playing fallback triggered:', err.message);
-      return MOCK_NOW_PLAYING;
+      console.error('TMDB Now Playing error:', err.message);
+      return [];
     }
   },
 
   getPopular: async () => {
+    if (!API_KEY) return [];
     try {
-      if (!API_KEY) return MOCK_POPULAR;
       const res = await apiClient.get('/movie/popular');
-      return res.data?.results?.length ? res.data.results : MOCK_POPULAR;
+      return res?.data?.results || [];
     } catch (err) {
-      console.warn('TMDB Popular fallback triggered:', err.message);
-      return MOCK_POPULAR;
+      console.error('TMDB Popular error:', err.message);
+      return [];
     }
   },
 
   getTopRated: async () => {
+    if (!API_KEY) return [];
     try {
-      if (!API_KEY) return MOCK_TOP_RATED;
       const res = await apiClient.get('/movie/top_rated');
-      return res.data?.results?.length ? res.data.results : MOCK_TOP_RATED;
+      return res?.data?.results || [];
     } catch (err) {
-      console.warn('TMDB Top Rated fallback triggered:', err.message);
-      return MOCK_TOP_RATED;
+      console.error('TMDB Top Rated error:', err.message);
+      return [];
     }
   },
 
   getUpcoming: async () => {
+    if (!API_KEY) return [];
     try {
-      if (!API_KEY) return MOCK_UPCOMING;
       const res = await apiClient.get('/movie/upcoming');
-      return res.data?.results?.length ? res.data.results : MOCK_UPCOMING;
+      return res?.data?.results || [];
     } catch (err) {
-      console.warn('TMDB Upcoming fallback triggered:', err.message);
-      return MOCK_UPCOMING;
+      console.error('TMDB Upcoming error:', err.message);
+      return [];
     }
   },
 
   getTrending: async () => {
+    if (!API_KEY) return [];
     try {
-      if (!API_KEY) return MOCK_POPULAR;
       const res = await apiClient.get('/trending/movie/week');
-      return res.data?.results?.length ? res.data.results : MOCK_POPULAR;
+      return res?.data?.results || [];
     } catch (err) {
-      console.warn('TMDB Trending fallback triggered:', err.message);
-      return MOCK_POPULAR;
+      console.error('TMDB Trending error:', err.message);
+      return [];
     }
   },
 
   getMovieDetails: async (id) => {
+    if (!API_KEY || !id) return null;
     try {
-      if (!API_KEY) {
-        const found = [...MOCK_POPULAR, ...MOCK_TOP_RATED, ...MOCK_UPCOMING].find(
-          (m) => String(m.id) === String(id)
-        );
-        return found || MOCK_NOW_PLAYING[0];
-      }
       const res = await apiClient.get(`/movie/${id}`);
-      return res.data;
+      return res?.data || null;
     } catch (err) {
-      console.warn(`TMDB Details fallback triggered for id ${id}:`, err.message);
-      const found = [...MOCK_POPULAR, ...MOCK_TOP_RATED, ...MOCK_UPCOMING].find(
-        (m) => String(m.id) === String(id)
-      );
-      return found || MOCK_NOW_PLAYING[0];
+      console.error(`TMDB Details error for id ${id}:`, err.message);
+      return null;
     }
   },
 
   getMovieCredits: async (id) => {
+    if (!API_KEY || !id) return { cast: [], crew: [] };
     try {
-      if (!API_KEY) return { cast: MOCK_CAST, crew: [] };
       const res = await apiClient.get(`/movie/${id}/credits`);
-      return res.data || { cast: MOCK_CAST, crew: [] };
+      return res?.data || { cast: [], crew: [] };
     } catch (err) {
-      console.warn(`TMDB Credits fallback triggered for id ${id}:`, err.message);
-      return { cast: MOCK_CAST, crew: [] };
+      console.error(`TMDB Credits error for id ${id}:`, err.message);
+      return { cast: [], crew: [] };
+    }
+  },
+
+  getMovieVideos: async (id) => {
+    if (!API_KEY || !id) return [];
+    try {
+      const res = await apiClient.get(`/movie/${id}/videos`);
+      return res?.data?.results || [];
+    } catch (err) {
+      console.error(`TMDB Videos error for id ${id}:`, err.message);
+      return [];
     }
   },
 
   getSimilarMovies: async (id) => {
+    if (!API_KEY || !id) return [];
     try {
-      if (!API_KEY) return MOCK_POPULAR.slice(2, 8);
       const res = await apiClient.get(`/movie/${id}/similar`);
-      return res.data?.results?.length ? res.data.results : MOCK_POPULAR.slice(2, 8);
+      return res?.data?.results || [];
     } catch (err) {
-      console.warn(`TMDB Similar fallback triggered for id ${id}:`, err.message);
-      return MOCK_POPULAR.slice(2, 8);
+      console.error(`TMDB Similar error for id ${id}:`, err.message);
+      return [];
     }
   },
 
   getRecommendations: async (id) => {
+    if (!API_KEY || !id) return [];
     try {
-      if (!API_KEY) return MOCK_TOP_RATED;
       const res = await apiClient.get(`/movie/${id}/recommendations`);
-      return res.data?.results?.length ? res.data.results : MOCK_TOP_RATED;
+      return res?.data?.results || [];
     } catch (err) {
-      console.warn(`TMDB Recommendations fallback triggered for id ${id}:`, err.message);
-      return MOCK_TOP_RATED;
+      console.error(`TMDB Recommendations error for id ${id}:`, err.message);
+      return [];
     }
   },
 
   searchMovies: async (query) => {
-    if (!query || !query.trim()) return [];
+    if (!API_KEY || !query || !query.trim()) return [];
     try {
-      if (!API_KEY) {
-        const q = query.toLowerCase();
-        return [...MOCK_POPULAR, ...MOCK_TOP_RATED, ...MOCK_UPCOMING].filter(
-          (m) => m.title?.toLowerCase().includes(q) || m.overview?.toLowerCase().includes(q)
-        );
-      }
       const res = await apiClient.get('/search/movie', {
         params: { query: query.trim() },
       });
-      return res.data?.results || [];
+      return res?.data?.results || [];
     } catch (err) {
-      console.warn('TMDB Search fallback triggered:', err.message);
-      const q = query.toLowerCase();
-      return [...MOCK_POPULAR, ...MOCK_TOP_RATED, ...MOCK_UPCOMING].filter(
-        (m) => m.title?.toLowerCase().includes(q) || m.overview?.toLowerCase().includes(q)
-      );
+      console.error('TMDB Search error:', err.message);
+      return [];
+    }
+  },
+
+  // --- TV Series Endpoints ---
+  getPopularTV: async () => {
+    if (!API_KEY) return [];
+    try {
+      const res = await apiClient.get('/tv/popular');
+      return res?.data?.results || [];
+    } catch (err) {
+      console.error('TMDB Popular TV error:', err.message);
+      return [];
+    }
+  },
+
+  getTopRatedTV: async () => {
+    if (!API_KEY) return [];
+    try {
+      const res = await apiClient.get('/tv/top_rated');
+      return res?.data?.results || [];
+    } catch (err) {
+      console.error('TMDB Top Rated TV error:', err.message);
+      return [];
+    }
+  },
+
+  getOnTheAirTV: async () => {
+    if (!API_KEY) return [];
+    try {
+      const res = await apiClient.get('/tv/on_the_air');
+      return res?.data?.results || [];
+    } catch (err) {
+      console.error('TMDB On The Air TV error:', err.message);
+      return [];
+    }
+  },
+
+  getTrendingTV: async () => {
+    if (!API_KEY) return [];
+    try {
+      const res = await apiClient.get('/trending/tv/week');
+      return res?.data?.results || [];
+    } catch (err) {
+      console.error('TMDB Trending TV error:', err.message);
+      return [];
+    }
+  },
+
+  getTVDetails: async (id) => {
+    if (!API_KEY || !id) return null;
+    try {
+      const res = await apiClient.get(`/tv/${id}`);
+      return res?.data || null;
+    } catch (err) {
+      console.error(`TMDB TV Details error for id ${id}:`, err.message);
+      return null;
+    }
+  },
+
+  getTVCredits: async (id) => {
+    if (!API_KEY || !id) return { cast: [], crew: [] };
+    try {
+      const res = await apiClient.get(`/tv/${id}/credits`);
+      return res?.data || { cast: [], crew: [] };
+    } catch (err) {
+      console.error(`TMDB TV Credits error for id ${id}:`, err.message);
+      return { cast: [], crew: [] };
+    }
+  },
+
+  getTVVideos: async (id) => {
+    if (!API_KEY || !id) return [];
+    try {
+      const res = await apiClient.get(`/tv/${id}/videos`);
+      return res?.data?.results || [];
+    } catch (err) {
+      console.error(`TMDB TV Videos error for id ${id}:`, err.message);
+      return [];
+    }
+  },
+
+  searchTV: async (query) => {
+    if (!API_KEY || !query || !query.trim()) return [];
+    try {
+      const res = await apiClient.get('/search/tv', {
+        params: { query: query.trim() },
+      });
+      return res?.data?.results || [];
+    } catch (err) {
+      console.error('TMDB TV Search error:', err.message);
+      return [];
     }
   },
 };

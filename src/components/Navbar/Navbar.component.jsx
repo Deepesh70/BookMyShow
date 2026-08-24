@@ -4,6 +4,11 @@ import { FaFilm, FaUserCircle, FaBookmark, FaStar } from 'react-icons/fa';
 import { MovieContext } from '../context/Movies.context';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import tmdbService from '../../services/tmdb';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+
+const CLERK_KEY =
+  process.env.REACT_APP_CLERK_PUBLISHABLE_KEY ||
+  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 const Navbar = () => {
   const { search, setSearch, myList } = useContext(MovieContext);
@@ -14,6 +19,8 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
+
+  const isClerkActive = Boolean(CLERK_KEY && CLERK_KEY.startsWith('pk_'));
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,7 +52,7 @@ const Navbar = () => {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Movies', path: '/movies' },
-    { name: 'Plays & Events', path: '/plays' },
+    { name: 'TV Series', path: '/series' },
   ];
 
   const handleSuggestionClick = (movieId) => {
@@ -193,8 +200,8 @@ const Navbar = () => {
 
             {/* My List Icon */}
             <Link
-              to="/"
-              title="My List"
+              to="/profile"
+              title="My Watchlist"
               className="relative p-2 rounded-xl bg-dark-800/80 border border-white/10 text-gray-300 hover:text-accent-gold hover:border-accent-gold/40 transition-colors"
             >
               <FaBookmark className="w-4 h-4" />
@@ -205,10 +212,35 @@ const Navbar = () => {
               )}
             </Link>
 
-            {/* User Icon */}
-            <div className="p-1.5 rounded-xl bg-dark-800/80 border border-white/10 text-gray-300 hover:text-accent-gold cursor-pointer transition-colors">
-              <FaUserCircle className="w-6 h-6" />
-            </div>
+            {/* Clerk Auth Controls or Fallback Avatar */}
+            {isClerkActive ? (
+              <div className="flex items-center gap-2">
+                <SignedIn>
+                  <Link
+                    to="/profile"
+                    title="Profile & Account"
+                    className="p-1 rounded-xl bg-dark-800 border border-white/10 flex items-center"
+                  >
+                    <UserButton afterSignOutUrl="/" />
+                  </Link>
+                </SignedIn>
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <button className="bg-accent-gold hover:bg-accent-goldHover text-dark-900 font-extrabold text-xs px-3.5 py-1.5 rounded-xl transition-all shadow-md hover:scale-105">
+                      Sign In
+                    </button>
+                  </SignInButton>
+                </SignedOut>
+              </div>
+            ) : (
+              <Link
+                to="/profile"
+                title="My Profile & Account"
+                className="p-1.5 rounded-xl bg-dark-800/80 border border-white/10 text-gray-300 hover:text-accent-gold hover:border-accent-gold/40 transition-colors"
+              >
+                <FaUserCircle className="w-6 h-6" />
+              </Link>
+            )}
 
             {/* Mobile Menu Button */}
             <button
@@ -235,6 +267,13 @@ const Navbar = () => {
               {link.name}
             </Link>
           ))}
+          <Link
+            to="/profile"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2.5 rounded-lg text-sm font-medium text-accent-gold hover:bg-white/5"
+          >
+            My Profile & VIP Pass
+          </Link>
         </div>
       )}
     </header>

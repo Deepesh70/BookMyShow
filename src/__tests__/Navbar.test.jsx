@@ -16,7 +16,7 @@ describe('Navbar Component', () => {
 
     expect(screen.getByText('Flex')).toBeInTheDocument();
     expect(screen.getByText('Watch')).toBeInTheDocument();
-    expect(screen.getByText('Plays & Events')).toBeInTheDocument();
+    expect(screen.getByText('TV Series')).toBeInTheDocument();
   });
 
   test('allows search input interaction', () => {

@@ -1,34 +1,41 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaStar, FaPlus, FaCheck, FaPlay } from 'react-icons/fa';
 import { MovieContext } from '../context/Movies.context';
 
+const FALLBACK_POSTER =
+  'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=500&q=80';
+
 const Poster = (props) => {
   const { toggleMyList, isInMyList, openTrailer } = useContext(MovieContext);
-  const [imgSrc, setImgSrc] = useState(
-    props.poster_path
-      ? (props.poster_path.startsWith('http')
-        ? props.poster_path
-        : `https://image.tmdb.org/t/p/w500${props.poster_path}`)
-      : 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=500&q=80'
-  );
+  const [hasError, setHasError] = useState(false);
+
+  // Compute poster image URL directly from props
+  const rawPoster = props.poster_path;
+  const posterUrl = rawPoster
+    ? rawPoster.startsWith('http')
+      ? rawPoster
+      : `https://image.tmdb.org/t/p/w500${rawPoster}`
+    : FALLBACK_POSTER;
+
+  // Reset error state whenever movie ID or poster_path prop changes
+  useEffect(() => {
+    setHasError(false);
+  }, [props.id, props.poster_path]);
 
   const year = props.release_date ? new Date(props.release_date).getFullYear() : '';
   const rating = props.vote_average ? Number(props.vote_average).toFixed(1) : '';
   const isSaved = isInMyList ? isInMyList(props.id) : false;
 
-  const handleImageError = () => {
-    setImgSrc('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=500&q=80');
-  };
-
   return (
-    <div className="movie-card flex flex-col items-start gap-2 px-1.5 py-2 group">
+    <div className="movie-card flex flex-col items-start gap-2 px-1.5 py-2 group w-full max-w-[220px]">
       <div className="relative w-full aspect-[2/3] overflow-hidden rounded-xl bg-dark-700 border border-white/5 shadow-lg group-hover:border-accent-gold/40 transition-all duration-300">
         <Link to={`/movie/${props.id}`} className="block w-full h-full">
           <img
-            src={imgSrc}
+            key={props.id ? `poster-${props.id}` : posterUrl}
+            src={hasError ? FALLBACK_POSTER : posterUrl}
             alt={props.title || props.original_title || 'Movie Poster'}
-            onError={handleImageError}
+            onError={() => setHasError(true)}
             className="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
           />

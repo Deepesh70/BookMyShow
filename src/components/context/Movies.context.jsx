@@ -1,4 +1,5 @@
 import React, { useState, createContext, useEffect } from 'react';
+import tmdbService from '../../services/tmdb';
 
 export const MovieContext = createContext();
 
@@ -25,8 +26,7 @@ const MovieProvider = ({ children }) => {
     }
   });
 
-  const [activeTrailer, setActiveTrailer] = useState(null); // movie object or null
-  const [bookingData, setBookingData] = useState(null); // { movie, plan } or null
+  const [activeTrailer, setActiveTrailer] = useState(null); // { ...movie, videoKey, loading } or null
 
   useEffect(() => {
     try {
@@ -51,11 +51,51 @@ const MovieProvider = ({ children }) => {
     return myList.some((m) => m.id === movieId);
   };
 
-  const openTrailer = (movieItem) => setActiveTrailer(movieItem);
-  const closeTrailer = () => setActiveTrailer(null);
+  // Dynamically fetch the official movie trailer from TMDB videos
+  const openTrailer = async (movieItem) => {
+    if (!movieItem) return;
 
-  const openBooking = (movieItem, plan = 'Rent') => setBookingData({ movie: movieItem, plan });
-  const closeBooking = () => setBookingData(null);
+    // Open modal immediately with loading state
+    setActiveTrailer({
+      ...movieItem,
+      videoKey: null,
+      loading: true,
+    });
+
+    try {
+      if (movieItem.id) {
+        const videos = await tmdbService.getMovieVideos(movieItem.id);
+        // Priority: Official YouTube Trailer > YouTube Trailer > YouTube Teaser > Any YouTube Clip
+        const trailer =
+          videos.find((v) => v.site === 'YouTube' && v.type === 'Trailer' && v.official) ||
+          videos.find((v) => v.site === 'YouTube' && v.type === 'Trailer') ||
+          videos.find((v) => v.site === 'YouTube' && v.type === 'Teaser') ||
+          videos.find((v) => v.site === 'YouTube' && v.type === 'Clip') ||
+          videos.find((v) => v.site === 'YouTube');
+
+        setActiveTrailer({
+          ...movieItem,
+          videoKey: trailer ? trailer.key : null,
+          loading: false,
+        });
+      } else {
+        setActiveTrailer({
+          ...movieItem,
+          videoKey: null,
+          loading: false,
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching trailer videos from TMDB:', err);
+      setActiveTrailer({
+        ...movieItem,
+        videoKey: null,
+        loading: false,
+      });
+    }
+  };
+
+  const closeTrailer = () => setActiveTrailer(null);
 
   return (
     <MovieContext.Provider
@@ -70,9 +110,6 @@ const MovieProvider = ({ children }) => {
         activeTrailer,
         openTrailer,
         closeTrailer,
-        bookingData,
-        openBooking,
-        closeBooking,
       }}
     >
       {children}
