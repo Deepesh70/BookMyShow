@@ -4,6 +4,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/Home.page';
+import MoviesPage from './pages/Movies.page';
 import MoviePage from './pages/Movie.page';
 import PlayPage from './pages/play.page';
 import MovieProvider from './components/context/Movies.context';
@@ -15,7 +16,7 @@ function App() {
       <MovieProvider>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/movies" element={<HomePage />} />
+          <Route path="/movies" element={<MoviesPage />} />
           <Route path="/movie/:id" element={<MoviePage />} />
           <Route path="/plays" element={<PlayPage />} />
           {/* Catch-all redirect to Home */}
